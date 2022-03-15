@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Anything outside of the RECOGNIZER element can be left untouched -->
+<CMD CMDVersion="1.1" xmlns="http://www.clarin.eu/cmd/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.clarin.eu/cmd/ http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1430905751617/xsd">
+    <!-- See http://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&itemId=clarin.eu:cr1:p_1430905751617 -->
+    <Header></Header>
+    <Resources>
+        <ResourceProxyList></ResourceProxyList>
+        <JournalFileProxyList></JournalFileProxyList>
+        <ResourceRelationList></ResourceRelationList>
+    </Resources>
+    <Components>
+        <RECOGNIZER>
+            <recognizer recognizerType="local" runLinux="./cmulab_diarization_elan.sh" runMac="./cmulab_diarization_elan.sh" runWin="cmd /c .\cmulab_diarization_elan.bat"
+                    info="CMULAB speaker diarization">CMULAB_speaker_diarization</recognizer>
+            <documentation>cmulab_diarization_elan.html</documentation>
+            <input level="basic" type="audio" optional="false"
+                    mimetypes="audio/x-wav"
+                    info="Input audio file (WAV)">source</input>
+
+            <input level="basic" type="tier" default="none"
+                    mimetypes="text/plain"
+                    info="Input tier to process">input_tier</input>
+
+            <numparam min="0.0" max="1.0" default="0.45" info="Threshold">
+                threshold
+            </numparam>
+
+            <textparam level="basic" default="http://rabat.sp.cs.cmu.edu:8088/"
+                    info="CMULAB backend server URL">server_url</textparam>
+
+            <textparam level="basic" default=""
+                    info="Auth token">auth_token</textparam>
+
+            <output level="basic" type="tier" optional="false"
+                    mimetypes="text/xml"
+                    info="Output recognized text">output_tier</output>
+        </RECOGNIZER>
+    </Components>
+</CMD>
