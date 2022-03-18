@@ -19,7 +19,7 @@ import json
 import traceback
 from utils.create_dataset import create_dataset_from_eaf
 from credentials import ask_for_authtoken
-import tkinter.messagebox
+import tkinter, tkinter.messagebox
 
 
 # The set of annotations (dicts) parsed out of the given ELAN tier.
@@ -32,6 +32,13 @@ params = {}
 @atexit.register
 def cleanup():
     pass
+
+def messagebox(title="", message=""):
+    root = tkinter.Tk()
+    root.overrideredirect(True)
+    root.withdraw()
+    tkinter.messagebox.showinfo(title=title, message=message)
+    root.destroy()
 
 # Read in all of the parameters that ELAN passes to this local recognizer on
 # standard input.
@@ -70,6 +77,11 @@ if os.path.exists(input_tier):
                     'value' : match.group(3) }
                 annotations.append(annotation)
 
+if not annotations:
+    messagebox(title="ERROR", message="Please select an input tier containing a few sample speaker annotations.")
+    print('RESULT: FAILED.', flush = True)
+    sys.exit(1)
+
 
 print("PROGRESS: 0.9 Running speaker diarization...", flush = True)
 with open(params['source'],'rb') as audio_file:
@@ -87,9 +99,17 @@ with open(params['source'],'rb') as audio_file:
         print(json.dumps(headers, indent=4))
         r = requests.post(url, files=files, data={"segments": json.dumps(annotations), "params": json.dumps(request_params)}, headers=headers)
     except:
-        sys.stderr.write("Error connecting to backend server " + params['server_url'] + "\n")
+        err_msg = "Error connecting to CMULAB server " + params['server_url']
+        sys.stderr.write(err_msg + "\n")
         traceback.print_exc()
+        messagebox(title="ERROR", message=err_msg)
+        print('RESULT: FAILED.', flush = True)
+        sys.exit(1)
     print("Response from CMULAB server " + params['server_url'] + ": " + r.text)
+    if not r.ok:
+        messagebox(title="ERROR", message="Server error, click the report button to view logs.")
+        print('RESULT: FAILED.', flush = True)
+        sys.exit(1)
     transcribed_annotations = json.loads(r.text)
 
 
